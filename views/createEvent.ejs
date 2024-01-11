@@ -1,0 +1,9 @@
+<%- include('layout', { body: `
+    <h2>Crea Evento</h2>
+    <form action="/api/events/create" method="post">
+        <input type="text" name="eventName" placeholder="Nome dell'evento" required><br><br>
+        <input type="date" name="eventDate" required><br><br>
+        <label><input type="checkbox" name="isBlindTasting"> Evento alla cieca</label><br><br>
+        <input type="submit" value="Crea Evento">
+    </form>
+` }) %>

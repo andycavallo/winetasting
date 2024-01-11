@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wine Tasting</title>
+    <link rel="stylesheet" href="/styles.css">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+	<div>
+        <a href="/wine-tasting" class="button">Home</a>
+        <% if (locals.userId) { %>
+            <a href="/logout" class="button">Logout</a>
+        <% } %>
+    </div>
+    <div class="container">
+        <h1>Wine Tasting</h1>
+        <h2>Inizia</h2>
+        <a href="/create-event" class="button">Crea un Evento</a>
+        <a href="/join-event" class="button">Partecipa a un Evento</a>
+        
+        <h2>I miei eventi</h2>
+        <% if (events && events.length > 0) { %>
+        <table class="table-responsive">
+            <thead>
+                <tr>
+                    <th>Nome Evento</th>
+                    <th>Data</th>
+                    <th>Degustazione alla cieca</th>
+					<th>Partecipanti</th>
+					<th>Vini</th>
+					<th></th>
+                </tr>
+            </thead>
+            <tbody>
+				<% events.forEach(event => { %>
+					<tr>
+						<td><a href="/event-detail/<%= event._id %>"><%= event.name %></a></td>
+						<td><%= new Date(event.date).toLocaleDateString() %></td>
+						<td><%= event.isBlindTasting ? 'Sì' : 'No' %></td>
+						<td><%= event.participants.length %></td>
+						<td><%= event.wines.length %></td>
+						<% if (locals.userId && event.user.equals(locals.userId)) { %>
+							<td>
+								<form action="/api/events/remove/<%= event._id %>" method="post">
+									<button type="submit" class="remove-button">&times;</button>
+								</form>
+							</td>
+						<% } %>
+					</tr>
+				<% }); %>
+            </tbody>
+        </table>
+        <% } else { %>
+            <p>Non hai ancora creato eventi.</p>
+        <% } %>
+    </div>
+</body>
+</html>

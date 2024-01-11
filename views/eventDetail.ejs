@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dettagli Evento</title>
+    <link rel="stylesheet" href="/styles.css">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+		// Funzione JavaScript per inviare una richiesta AJAX e aggiornare il DOM
+		function updateEventStatus(eventId, isBlindTasting) {
+			fetch('/api/events/update-status/' + eventId, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ isBlindTasting: isBlindTasting })
+			})
+			.then(response => response.json())
+			.then(data => {
+				if(data.success) {
+					// Aggiorna il DOM qui in base ai dati ricevuti
+					// Ad esempio, aggiornare la visualizzazione dei vini
+					updateWineDisplay(data.wines);
+				}
+			})
+			.catch(error => console.error('Errore:', error));
+		}
+
+		// Funzione per aggiornare la visualizzazione dei vini
+		function updateWineDisplay(wines) {
+			// Logica per aggiornare il DOM in base ai vini ricevuti
+		}
+		function copyToClipboard(id) {
+			// Crea un elemento textarea temporaneo
+			var tempElement = document.createElement("textarea");
+			// Assegna l'ID come valore al textarea
+			tempElement.value = id;
+			// Aggiungi l'elemento temporaneo al documento
+			document.body.appendChild(tempElement);
+			// Seleziona il contenuto del textarea
+			tempElement.select();
+			// Copia il contenuto selezionato negli appunti
+			document.execCommand("copy");
+			// Rimuovi l'elemento temporaneo dal documento
+			document.body.removeChild(tempElement);
+			// Mostra un messaggio di conferma
+			alert("ID copiato: " + id);
+		}
+		function sortTable() {
+				var table, rows, switching, i, x, y, shouldSwitch;
+				table = document.getElementById("wineTable");
+				switching = true;
+				// Esegui un loop fino a quando non ci sono scambi da fare
+				while (switching) {
+					switching = false;
+					rows = table.rows;
+					// Esegui un loop attraverso tutte le righe della tabella (tranne l'intestazione)
+					for (i = 1; i < (rows.length - 1); i++) {
+						shouldSwitch = false;
+						// Ottieni gli elementi da confrontare, uno dalla riga corrente e uno dalla successiva
+						x = rows[i].getElementsByTagName("TD")[document.getElementById("sortOption").selectedIndex];
+						y = rows[i + 1].getElementsByTagName("TD")[document.getElementById("sortOption").selectedIndex];
+						// Verifica se le due righe devono essere scambiate
+						if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+							shouldSwitch = true;
+							break;
+						}
+					}
+					if (shouldSwitch) {
+						// Se c'è stato uno scambio, eseguilo e segna che c'è stato uno scambio
+						rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+						switching = true;
+					}
+				}
+			}
+		function changeBlindTastingStatus(eventId) {
+			var checkbox = document.getElementById('blindTastingCheckbox');
+			var isBlindTasting = checkbox.checked;
+
+			fetch('/api/events/change-blind-tasting-status/' + eventId, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ isBlindTasting: isBlindTasting })
+			})
+			.then(response => response.json())
+			.then(data => {
+				if(data.success) {
+					// Gestisci la risposta positiva qui
+					alert('Stato della degustazione alla cieca aggiornato');
+				} else {
+					// Gestisci l'errore qui
+					alert('Errore nell\'aggiornamento dello stato');
+				}
+			})
+			.catch(error => {
+				console.error('Errore:', error);
+			});
+		}
+    </script>
+</head>
+<body>
+    <div style="text-align: center; margin: 10px;">
+        <a href="/wine-tasting" class="button">Home</a>
+        <% if (locals.userId) { %>
+            <a href="/logout" class="button">Logout</a>
+        <% } %>
+    </div>
+    <div class="container">
+        <h1>Dettagli dell'Evento: <%= eventData.name %></h1>
+        <p><strong>ID Evento:</strong> <%= eventData._id %></p>
+        <button onclick="copyToClipboard('<%= eventData._id %>')">Copia ID</button>
+        <p><strong>Data:</strong> <%= new Date(eventData.date).toLocaleDateString() %></p>
+        <p>
+		<strong>Degustazione alla cieca:</strong> 
+		<% if (locals.userId && locals.userId.toString() === eventData.user.toString()) { %>
+			<input type="checkbox" id="blindTastingCheckbox" <% if (eventData.isBlindTasting) { %>checked<% } %> onchange="changeBlindTastingStatus('<%= eventData._id %>')">
+		<% } else { %>
+			<%= eventData.isBlindTasting ? 'Sì' : 'No' %>
+		<% } %>
+		</p>
+
+        <h3>Partecipanti</h3>
+        <table class="table-responsive">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Cognome</th>
+                    <th>Ruolo</th>
+					<th>Elimina</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% eventData.participants.forEach(participant => { %>
+                    <tr>
+                        <td><%= participant.user.name %></td>
+                        <td><%= participant.user.surname %></td>
+                        <td><%= participant.user._id.equals(eventData.user) ? 'Organizzatore' : 'Partecipante' %></td>
+						<% if (locals.userId && locals.userId.toString() === eventData.user.toString() && !participant.user._id.equals(eventData.user)) { %>
+                    	<td>
+                        <form action="/api/events/remove-participant/<%= eventData._id %>/<%= participant.user._id %>" method="post">
+                            <button type="submit" class="remove-button">&times;</button>
+                        </form>
+                   	 	</td>
+						<% } else { %>
+            			<td class="empty-remove-cell"></td> <!-- Cella vuota per mantenere la struttura della tabella -->
+          			  <% } %>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+        <h3>Vini Associati all'Evento</h3>
+		<label for="sortOption">Ordina per:</label>
+			<select id="sortOption" onchange="sortTable()">
+				<option value="name">Nome</option>
+				<option value="producer">Produttore</option>
+				<option value="year">Annata</option>
+				<option value="score">Voto</option>
+			</select>
+        <br><br>
+		<% if (eventData.wines && eventData.wines.length > 0) { %>
+            <table id="wineTable" class="table-responsive">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Produttore</th>
+                        <th>Annata</th>
+                        <th>Immagine</th>
+                        <th>Voto</th>
+						<th>Elimina</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% eventData.wines.forEach((wine, index) => { %>
+                        <tr>
+							<td><%= eventData.isBlindTasting && locals.userId && locals.userId.toString() !== eventData.user.toString() ? 'Vino ' + (index + 1) : wine.name %></td>
+							<td><%= eventData.isBlindTasting && locals.userId && locals.userId.toString() !== eventData.user.toString() ? 'Sconosciuto' : wine.producer %></td>
+							<td><%= eventData.isBlindTasting && locals.userId && locals.userId.toString() !== eventData.user.toString() ? 'Sconosciuta' : wine.year %></td>
+							<td>
+								<% if (wine.imagePath && (!eventData.isBlindTasting || locals.userId.toString() === eventData.user.toString())) { %>
+									<img src="/<%= wine.imagePath %>" alt="Immagine Vino">
+								<% } else { %>
+									<span>Sconosciuta</span>
+								<% } %>
+							</td>
+							<td>
+								<% 
+									// Verifica se tutti i partecipanti hanno inviato le loro valutazioni
+									const allRatingsSubmitted = eventData.participants.every(participant =>
+										wine.ratings.some(rating => rating.user.toString() === participant.user._id.toString() && rating.submitted)
+									);
+
+									// Calcola il punteggio medio se tutte le valutazioni sono state inviate
+								if (allRatingsSubmitted) {
+											const averageScore = wine.calculateAverageRating().toFixed(1);
+											%>
+											<a href="/wine-ratings/<%= wine._id %>">Media: <%= averageScore %></a>
+											<% 
+										} else {
+											const userRating = wine.ratings.find(r => r.user.toString() === locals.userId.toString());
+											if (userRating && userRating.submitted) {
+												%> Valutazione Inviata <% 
+											} else {
+												%> <a class="button" href="/rate-wine/<%= wine._id %>">Valuta</a> <% 
+											}
+										}
+									%>
+								</td>
+                            <% if (locals.userId && eventData.user.toString() === locals.userId.toString()) { %>
+                                <td>
+                                    <form action="/api/wines/remove/<%= wine._id %>" method="post">
+                                        <button type="submit" class="remove-button">&times;</button>
+                                    </form>
+                                </td>
+                            <% } %>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <p>Nessun vino associato a questo evento.</p>
+        <% } %>
+        <% if (locals.userId && eventData.user.toString() === locals.userId.toString()) { %>
+            <a href="/add-wine<%= '?eventId=' + eventData._id %>" class="button">Aggiungi Vini</a>
+        <% } %>
+    </div>
+</body>
+</html>

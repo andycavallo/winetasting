@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aggiungi Vino</title>
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div style="text-align: center; margin: 10px;">
+        <a href="/wine-tasting" class="button">Home</a>
+        <% if (locals.userId) { %>
+            <a href="/logout" class="button">Logout</a>
+        <% } %>
+    </div>
+    <div class="container">
+        <h1>Aggiungi Vino</h1>
+        <form action="/api/wines/add" method="post" enctype="multipart/form-data">
+            <input type="text" name="name" placeholder="Nome Vino" required><br>
+            <input type="text" name="producer" placeholder="Produttore" required><br>
+            <input type="text" name="year" placeholder="Annata"><br>
+			<h2>Carica immagine o scatta una foto</h2> 
+            <input type="file" name="wineImage" accept="image/*" capture><br><br>
+            <input type="hidden" name="eventId" value="<%= eventId %>">
+            <input type="submit" value="Aggiungi Vino">
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dettagli Voti</title>
+    <link rel="stylesheet" href="/styles.css">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div style="text-align: center; margin: 10px;">
+        <a href="/wine-tasting" class="button">Home</a>
+        <% if (locals.userId) { %>
+            <a href="/logout" class="button">Logout</a>
+        <% } %>
+    </div>
+	<div class="container">
+    <% if (isBlindTasting && locals.userId.toString() !== eventData.user.toString()) { %>
+        <h1>Dettagli Voti per Vino <%= wineIndex %></h1>
+    <% } else { %>
+        <h1>Dettagli Voti per <%= wine.name %> <%= wine.year %></h1>
+    <% } %>
+<a href="/event-detail/<%= eventId %>" class="button">Torna all'Evento</a>
+		
+<table>
+    <thead>
+        <tr>
+            <th>Partecipante</th>
+            <th>Esame Visivo</th>
+            <th>Esame Olfattivo</th>
+            <th>Esame Gusto-Olfattivo</th>
+            <th>Giudizio Complessivo</th>
+            <th>Media</th>
+        </tr>
+    </thead>
+<tbody>
+    <% let totalScore = 0; %>
+    <% participants.forEach(participant => {
+		// Trova la valutazione del partecipante per questo specifico vino
+		const rating = wine.ratings.find(r => r.user._id.toString() === participant.user._id.toString());
+		// Se non c'è una valutazione, usa 0 come valore predefinito
+		const visualExam = rating ? rating.visualExam : 0;
+		const olfactoryExam = rating ? rating.olfactoryExam : 0;
+		const tasteOlfactoryExam = rating ? rating.tasteOlfactoryExam : 0;
+		const overallJudgment = rating ? rating.overallJudgment : 0;
+
+		// Calcola la media per il partecipante
+		const media = (visualExam + olfactoryExam + tasteOlfactoryExam + overallJudgment) / 4;
+		totalScore += media; %>
+        <tr>
+            <td><%= participant.user.name %> <%= participant.user.surname %></td>
+            <td><%= visualExam %></td>
+            <td><%= olfactoryExam %></td>
+            <td><%= tasteOlfactoryExam %></td>
+            <td><%= overallJudgment %></td>
+            <td><%= media.toFixed(1) %></td>
+        </tr>
+    <% }); %>
+    <tr>
+        <td colspan="5">Media Totale</td>
+        <td><%= (totalScore / participants.length).toFixed(1) %></td>
+    </tr>
+</tbody>
+
+
+</table>
+
+		</div>
+</body>
+</html>

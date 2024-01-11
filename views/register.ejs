@@ -1,0 +1,14 @@
+<%- include('layout', { body: `
+    <h2>Registrazione</h2>
+    <form action="/api/users/register" method="post">
+        <input type="text" name="name" placeholder="Nome" required><br>
+        <input type="text" name="surname" placeholder="Cognome" required><br>
+        <input type="email" name="email" placeholder="E-mail" required><br>
+        <input type="password" name="password" placeholder="Password" required><br>
+        <input type="password" name="confirmPassword" placeholder="Conferma Password" required><br>
+        <input type="submit" value="Crea Account">
+    </form>
+` }) %>
+<% if (query.error === "passwordsDontMatch") { %>
+    <p style="color: red;">Le password non corrispondono.</p>
+<% } %>

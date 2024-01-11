@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valutazione Vino</title>
+    <link rel="stylesheet" href="/styles.css">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+	    <script>
+        function updateRating() {
+            let visual = parseFloat(document.getElementById('visualExam').value);
+            let olfactory = parseFloat(document.getElementById('olfactoryExam').value);
+            let tasteOlfactory = parseFloat(document.getElementById('tasteOlfactoryExam').value);
+            let overall = parseFloat(document.getElementById('overallJudgment').value);
+            
+            let average = (visual + olfactory + tasteOlfactory + overall) / 4;
+
+            document.getElementById('visualExamValue').innerText = visual;
+            document.getElementById('olfactoryExamValue').innerText = olfactory;
+            document.getElementById('tasteOlfactoryExamValue').innerText = tasteOlfactory;
+            document.getElementById('overallJudgmentValue').innerText = overall;
+            document.getElementById('currentAverage').innerText = average.toFixed(1);
+        }
+    	</script>
+</head>
+<body>
+	    <div style="text-align: center; margin: 10px;">
+        <a href="/wine-tasting" class="button">Home</a>
+        <% if (locals.userId) { %>
+            <a href="/logout" class="button">Logout</a>
+        <% } %>
+    </div>
+    <div class="container">
+        <h1>Valutazione Vino</h1>
+        <form action="/api/wines/rate/<%= wine._id %>" method="post">
+            <div class="rating-slider">
+                <label for="visualExam">Esame Visivo (0-10): </label>
+                <input type="range" name="visualExam" id="visualExam" class="slider" min="0" max="10" step="0.5" oninput="updateRating()" required>
+                <span id="visualExamValue">5</span>
+            </div>
+            <div class="rating-slider">
+                <label for="olfactoryExam">Esame Olfattivo (0-10): </label>
+                <input type="range" name="olfactoryExam" id="olfactoryExam" class="slider" min="0" max="10" step="0.5" oninput="updateRating()" required>
+                <span id="olfactoryExamValue">5</span>
+            </div>
+            <div class="rating-slider">
+                <label for="tasteOlfactoryExam">Esame Gusto-Olfattivo (0-10): </label>
+                <input type="range" name="tasteOlfactoryExam" id="tasteOlfactoryExam" class="slider" min="0" max="10" step="0.5" oninput="updateRating()" required>
+                <span id="tasteOlfactoryExamValue">5</span>
+            </div>
+            <div class="rating-slider">
+                <label for="overallJudgment">Giudizio Complessivo (0-10): </label>
+                <input type="range" name="overallJudgment" id="overallJudgment" class="slider" min="0" max="10" step="0.5" oninput="updateRating()" required>
+                <span id="overallJudgmentValue">5</span>
+            </div>
+            <div>
+                <p>Media Attuale: <span id="currentAverage">5</span></p>
+            </div>
+            <input type="submit" value="Invia Valutazione" class="submit-button">
+        </form>
+    </div>
+</body>
+</html>
