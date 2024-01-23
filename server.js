@@ -21,13 +21,12 @@ app.use(session({
   saveUninitialized: true,
   cookie: { secure: false }
 }));
-
 // Modifica qui la stringa di connessione a MongoDB Atlas
-mongoose.connect('mongodb+srv://andycavallo:rgkh45ef@andycavallo.1mc65qd.mongodb.net/?retryWrites=true&w=majority')
+mongoose.connect('mongodb+srv://andycavallo:invinoveritas@andycavallo.1mc65qd.mongodb.net/?retryWrites=true&w=majority')
   .then(() => console.log('Connected to MongoDB Atlas'))
   .catch(err => console.error('Could not connect to MongoDB Atlas', err));
-/*
-mongoose.connect('mongodb://localhost:27017/wineTastingApp')
+
+/*mongoose.connect('mongodb://localhost:27017/wineTastingApp')
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('Could not connect to MongoDB', err));*/
 
