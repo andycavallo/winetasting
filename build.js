@@ -29,6 +29,6 @@ function ejs2html({
   });
 }
 ejs2html({
-  path: `${__dirname}/views/index.ejs`,
-  outPath: `${__dirname}/public/index.html`
+  path: `${__dirname}/views/*`,
+  outPath: `${__dirname}/public/*`
 });
