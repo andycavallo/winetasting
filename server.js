@@ -152,18 +152,23 @@ app.get('/wine-ratings/:wineId', async (req, res) => {
             return res.status(404).send("Evento non trovato");
         }
 
+        // Calcola l'indice del vino nell'array dei vini dell'evento
+        const wineIndex = event.wines.findIndex(w => w.toString() === wineId) + 1;
+
         res.render('wineRatings', { 
             eventId: event._id, 
             participants: event.participants, 
             wine: wine,
             isBlindTasting: event.isBlindTasting,
-			eventData: event
+            eventData: event,
+            wineIndex: wineIndex // Aggiungi questa linea
         });
     } catch (error) {
         console.log(error);
         res.status(500).send("Errore durante il recupero dei dettagli del vino");
     }
 });
+
 
 
 
